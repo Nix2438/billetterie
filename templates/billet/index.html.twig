@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes billets{% endblock %}
+
+{% block body %}
+    <h1>Mes billets</h1>
+
+    {% for billet in billets %}
+        <p>
+            {{ billet.rencontre.clubDomicile.nom }} contre {{ billet.rencontre.clubExterieur.nom }}
+            le {{ billet.rencontre.date|date('d/m/Y à H:i') }}
+            — réservé le {{ billet.dateAchat|date('d/m/Y') }}
+        </p>
+    {% else %}
+        <p>Vous n'avez aucun billet.</p>
+    {% endfor %}
+{% endblock %}

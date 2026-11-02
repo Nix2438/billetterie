@@ -31,4 +31,10 @@
     <a href="{{ path('app_rencontre_edit', {'id': rencontre.id}) }}">edit</a>
 
     {{ include('rencontre/_delete_form.html.twig') }}
+    {% if rencontre.complet %}
+    <p>Sold out</p>
+{% else %}
+    <p>{{ rencontre.placesRestantes }} places restantes</p>
+    <a href="{{ path('app_billet_reserver', {id: rencontre.id}) }}">Réserver une place</a>
+{% endif %}
 {% endblock %}

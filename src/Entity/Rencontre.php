@@ -47,7 +47,15 @@ class Rencontre
     {
         $this->billets = new ArrayCollection();
     }
+public function getPlacesRestantes(): int
+{
+    return $this->placesEnVente - count($this->billets);
+}
 
+public function isComplet(): bool
+{
+    return $this->getPlacesRestantes() <= 0;
+}
     public function getId(): ?int
     {
         return $this->id;

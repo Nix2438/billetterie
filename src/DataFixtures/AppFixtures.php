@@ -2,6 +2,9 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\User;
+use App\Entity\Rencontre;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use App\Entity\Stade;
 use App\Entity\Club;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -9,6 +12,10 @@ use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
+    public function __construct(
+    private UserPasswordHasherInterface $passwordHasher
+) {
+}
     public function load(ObjectManager $manager): void
     {
         $listeStades = [];
@@ -49,6 +56,37 @@ class AppFixtures extends Fixture
             $listeClubs[] = $club;
 
         }
+        $dateDepart = new \DateTimeImmutable('2026-10-09 20:00');
+$compteur = 0;
+
+for ($i = 0; $i < count($listeClubs); $i++) {
+    for ($j = $i + 1; $j < count($listeClubs); $j++) {
+        $rencontre = new Rencontre();
+        $rencontre->setClubDomicile($listeClubs[$i]);
+        $rencontre->setClubExterieur($listeClubs[$j]);
+        $rencontre->setStade($listeClubs[$i]->getStade());
+        $rencontre->setPrix('10.00');
+        $rencontre->setPlacesEnVente($listeClubs[$i]->getStade()->getCapacite());
+
+        $semaine = intdiv($compteur, 3);
+        $jour = $compteur % 3;
+        $rencontre->setDate($dateDepart->modify('+' . ($semaine * 7 + $jour) . ' days'));
+
+        $manager->persist($rencontre);
+        $compteur++;
+    }
+}
+$admin = new User();
+$admin->setEmail('admin@billetterie.fr');
+$admin->setRoles(['ROLE_ADMIN']);
+$admin->setPassword($this->passwordHasher->hashPassword($admin, 'password'));
+$manager->persist($admin);
+
+$user = new User();
+$user->setEmail('user@billetterie.fr');
+$user->setPassword($this->passwordHasher->hashPassword($user, 'password'));
+$manager->persist($user);
+
         $manager->flush();
     }
 }

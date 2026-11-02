@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RencontreRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -34,6 +36,17 @@ class Rencontre
     #[ORM\ManyToOne(inversedBy: 'rencontres')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Stade $stade = null;
+
+    /**
+     * @var Collection<int, Billet>
+     */
+    #[ORM\OneToMany(targetEntity: Billet::class, mappedBy: 'rencontre')]
+    private Collection $billets;
+
+    public function __construct()
+    {
+        $this->billets = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -108,6 +121,36 @@ class Rencontre
     public function setStade(?Stade $stade): static
     {
         $this->stade = $stade;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Billet>
+     */
+    public function getBillets(): Collection
+    {
+        return $this->billets;
+    }
+
+    public function addBillet(Billet $billet): static
+    {
+        if (!$this->billets->contains($billet)) {
+            $this->billets->add($billet);
+            $billet->setRencontre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBillet(Billet $billet): static
+    {
+        if ($this->billets->removeElement($billet)) {
+            // set the owning side to null (unless already changed)
+            if ($billet->getRencontre() === $this) {
+                $billet->setRencontre(null);
+            }
+        }
 
         return $this;
     }

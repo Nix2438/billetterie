@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Billetterie{% endblock %}
+
+{% block body %}
+    <h1>Billetterie</h1>
+
+    <nav>
+        <a href="{{ path('app_rencontre_index') }}">Tous les matchs</a> |
+        <a href="{{ path('app_club_index') }}">Clubs</a> |
+        <a href="{{ path('app_stade_index') }}">Stades</a> |
+        {% if app.user %}
+            <a href="{{ path('app_billet_mes_billets') }}">Mes billets</a> |
+            <a href="{{ path('app_logout') }}">Déconnexion ({{ app.user.email }})</a>
+        {% else %}
+            <a href="{{ path('app_login') }}">Connexion</a> |
+            <a href="{{ path('app_register') }}">Inscription</a>
+        {% endif %}
+    </nav>
+
+    <h2>Prochains matchs</h2>
+
+    {% for rencontre in rencontres %}
+        <p>
+            <a href="{{ path('app_rencontre_show', {id: rencontre.id}) }}">
+                {{ rencontre.clubDomicile.nom }} — {{ rencontre.clubExterieur.nom }}
+            </a>
+            le {{ rencontre.date|date('d/m/Y à H:i') }}
+            à {{ rencontre.stade.nom }}
+            ({{ rencontre.prix }} €)
+            {% if rencontre.complet %} — Sold out{% endif %}
+        </p>
+    {% endfor %}
+{% endblock %}
